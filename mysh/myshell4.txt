@@ -1,0 +1,38 @@
+
+Lupini dodajte podpora za preusmerjanje standardnega vhoda in izhoda vgrajenih in zunanjih ukazov.
+
+- Preusmerjanje izvedite, kadar je na koncu ukaza <vhod ali >izhod ali oboje. Temu lahko sledi še &.
+- Preusmerjanje naj deluje z vsemi kombinaciji: vgrajeni in zunanji ukazi ter izvajanje v ospredju in ozadju.
+
+Namigi za zunanje ukaze in vgrajene ukaze v ozadju:
+
+- Pri zunanjih ukazih je preusmerjanje preprosto, ker gre za vedno za podproces, je dovolj le kombinacija klicev open() in dup2().
+- Podobno je z vgrajenimi ukazi, ki se izvajajo v ozadju. Skratka naredite le pravilne preusmeritve in se ne sekiraje preveč.
+
+Namigi za vgrajene ukaze v ospredju:
+
+- Precej več pazljivosti pa je potrebno z notranjimi ukazi v ospredju.
+- Potrebno je začasno shraniti trenutno stanje deskriptorjev, ki jih preusmerjamo. Šele nato izvedemo preusmeritev in sam notranji ukaz. Na koncu pa je potrebno obnoviti staro stanje deskriptorjer. Sicer se vam lahko zgodi, da vam "izgine" vhod/izhod same lupine.
+
+Splošni namig:
+
+- Če uporabljate višje nivojske (buffered IO) funkcije za izpis, npr. printf(), je potrebno pred preusmeritvijo/obnovitvijo izhoda izvesti še fflush(stdout), da izpraznete V/I medpomnilnik. V nasprotnem primeru gre lahko izpis popolnoma drugam kot programer pričakuje, npr. kadar je originalni izhod že preusmerjen, kot je na primer pri avtomatskem testiranju.
+
+Lupini dodajte podpora za ukazne cevovode.
+
+Ukaz: pipes "stopnja 1" "stopnja 2" "stopnja 3" ...
+- Prisotni bosta vsaj dve stopnji.
+
+Primer cevovoda v vaši lupini:
+pipes "cat /etc/passwd" "cut -d: -f7" "sort" "uniq -c"
+
+kar je enakovredno kot naslednji cevovod v bash:
+cat /etc/passwd | cut -d: -f7 | sort | uniq -c
+
+Znotraj stopenj se preusmerjanje in izvajanje v ozadju ne bodo pojavili.
+Možna pa je seveda preusmeritev na nivoju celotnega cevovoda in tudi njegovo izvajanje v ozadju, npr.:
+pipes "rev" "cpcat" "rev" </etc/passwd >gesla &
+
+Namig:
+
+- Ukaz za posamezno stopnjo je znotraj narekovajev, zato se razčleni kot samostojen simbol. To je priročno, ker lahko ponovno uporabite funkcije za razpoznavanje in razčlenjevanje (tokenize in parse) in tako enostavno izvedete posamezne stopnje.

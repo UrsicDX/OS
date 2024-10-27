@@ -1,0 +1,92 @@
+
+Lupini dodajte naslednje vgrajene ukaze.
+
+Ukaz: pid
+- Izpis PID procesa lupine.
+
+Ukaz: ppid
+- Izpis PID starševskega procesa lupine.
+
+Ukaz: uid
+- Izpis UID uporabnika, ki je lastnik procesa lupine.
+
+Ukaz: euid
+- Izpis UID uporabnika, ki je aktualni lastnik procesa lupine.
+
+Ukaz: gid
+- Izpis GID skupine, kateri pripada procesa lupine.
+
+Ukaz: egid
+- Izpis GID skupine, kateri aktualno pripada procesa lupine.
+
+Ukaz: sysinfo
+- Izpiše osnovne informacije v sistemu.
+- Uporabite sistemski klic uname().
+- Izpišite polja: sysname, nodename, release, version, machine.
+
+Primer izpisa:
+Sysname: Linux
+Nodename: coderun
+Release: 4.19.0-16-amd64
+Version: #1 SMP Debian 4.19.181-1 (2021-03-19)
+Machine: x86_64
+
+Lupini dodajte naslednje vgrajene ukaze, ki informacije o procesih pridobijo iz procfs datotečnega sistema, ki se običajno nahaja v /proc. Za testiranje bomo uporabili prirejeni sistem, katerega lokacijo bomo podali z ukazom proc.
+
+Ukaz: proc pot
+- Nastavitev poti do procfs datotečnega sistema.
+- Brez argumenta se izpiše trenutna nastavitev. Privzeta nastavitev je /proc.
+- Če pa podamo argument, se nastavi nova pot do imenika, ki vsebuje procfs.
+- Pred nastavitvijo poti ta ukaz tudi preveri ali podana pot dejansko obstaja.
+- Če ne obstaja, se pot ne nastavi in vrne izhodni status 1.
+- Za preverjanje poti lahko uporabite funkcijo access(..., F_OK|R_OK).
+
+Ukaz: pids
+- Izpiše PIDe trenutnih procesov, ki jih pridobi iz procfs.
+- Vsak pid je izpisan v svoji vrstici.
+
+Ukaz: pinfo
+- Izpiše informacije o trenutnih procesih (PID, PPID, STANJE, IME), ki jih pridobi iz datoteke stat v procfs.
+- Za formatiranje izpisa uporabite naslednji format:
+printf("%5s %5s %6s %s
+", "PID", "PPID", "STANJE", "IME");
+
+Oba ukaza pids in pinfo procese izpišeta urejeno po PIDu. Za urejanje lahko uporabite qsort() iz knjižnice ali pa napište svoj algoritem.
+
+Primer izvedbe za pinfo:
+
+mysh> pinfo
+  PID  PPID STANJE IME
+    1     0      S bash
+   10     1      S bash
+   11    10      S sleep
+   12    10      S sleep
+   14     1      S dash
+   15    14      T dash
+   16    14      T dash
+   20    14      S copyproc.sh
+
+Lupini dodajte podporo za izvajanje zunanjih ukazov.
+- Če ne gre za vgrajeni ukaz, potem naj lupina poskuša zagnati zunanji ukaz.
+- Za zagon uporabite shemo fork() & exec() in (če gre za izvedbo v ospredju) waitpid().
+- Uporabite ustrezeno funkcijo exec(), da se bo upoštevala tudi spremenljivka PATH.
+- Če izvedba exec() zunanjega ukaza ne uspe, potem naj bo zadnji status enak 127.
+- Če pa uspe, potem naj bo zadnji status enak izhodnemu statusu izvedenega zadnjega ukaza.
+Namig: Če se vam po fork()-u otroka, dogajajo čudne stvari pri branju vhoda, potem pred forkom naredite še fflush(stdin).
+
+Lupini dodajte podporo za izvajanje ukazov v ozadju. Dodajte tudi dva vgrajena ukaza za čakanje in prevzemanje izhodnih statusov otrok.
+
+Izvajanje v ozadju
+- Če je zadnji simbol vrstice enak &, potem naj se podani ukaz izvede v ozadju.
+- Dodajte tudi ustrezen rokovalnik za obravnavo otrok zombijev. Napotke, kako ga pravilno implementirati dobite tukaj.
+
+Namig: dobro razmislite o izvajanju vgrajenih ukazov v ozadju, ali je potrebno ustvariti nov proces?
+Pozor: Pri forkanju oz. ustvarjanju otrok bodite zelo pazljivi, da otroci ne postanejo podlupine oz. da ne začenejo še sami brati vhoda in izvajati ukazov - tako boste hkrati imeli zagnani dve lupini, ne da bi to vedeli. Hierarhijo procesov med raazhroščevanjem vaše lupine preverjajte z ukazom ps ali pstree pid_lupine.
+
+Ukaz: waitone pid
+- Počaka na otroka s podanim pidom.
+- Če pida ne podamo, počaka na enega poljubnega otroka.
+- Če otrok ne obstaja, naj bo zadnji status 0, sicer pa izhodni status končanega otroka.
+
+Ukaz: waitall
+- Počaka na vse otroke.

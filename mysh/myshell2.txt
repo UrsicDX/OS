@@ -1,0 +1,81 @@
+
+Lupini dodajte naslednje vgrajene ukaze.
+
+Ukaz: print args...
+- Izpiše podane argumente na standardni izhod (brez končnega skoka v novo vrstico).
+
+Ukaz: echo args...
+- Kot ukaz print, le da izpiše še skok v novo vrstico.
+
+Ukaz: len args...
+- Izpiše skupno dolžino vseh argumentov (kot nizi).
+
+Ukaz: sum args...
+- Sešteje svoje argumente (cela števila) in izpiše vsoto.
+
+Ukaz: calc arg1 op arg2
+- Nad argumentoma arg1 in arg2 izvede operacijo op in izpiše rezultat.
+- Argumenta sta števili.
+- Operacija je lahko +, -, *, /, %.
+
+Ukaz: basename arg
+- Izpiše osnovno ime podane poti arg, podobno kot ukaz basename.
+
+Ukaz: dirname arg
+- Izpiše imenik podane poti arg, podobno kot ukaz dirname.
+
+Lupini dodajte naslednje vgrajene ukaze za delo z imeniki.
+
+Ukaz: dirch imenik
+
+Dodaj naslednje ukaze za delo z datotekami.
+
+Ukaz: rename izvor ponor
+- Preimenovanje datoteke izvor v ponor.
+
+Ukaz: unlink ime
+- Odstrani datoteko s podanim imenom.
+- Natančneje: odstrani le imeniški vnos s podanim imenom.
+- Gre za sistemski klic unlink().
+
+Ukaz: remove ime
+- Odstranjevanje datoteke ali imenika s podanim imenom.
+- Gre za sistemski klic remove().
+
+Ukaz: linkhard cilj ime
+- Ustvari trdo povezavo s podanim imenom na cilj.
+
+Ukaz: linksoft cilj ime
+- Ustvari simbolično povezavo s podanim imenom na cilj.
+
+Ukaz: linkread ime
+- Izpiše cilj podane simbolične povezave.
+
+Ukaz: linklist ime
+- V trenutnem delovnem imeniku poišče vse trde povezave na datoteko s podanim imenom.
+- Povezave se izpišejo ločene z dvema presledkoma.
+
+Ukaz: cpcat izvor ponor
+- Znana ukaza cp in cat združena v enega (glej izziv cpcat.c).
+
+Zamenjava trenutnega delovnega imenika (working directory).
+Če imenika ne podamo, naj skoči na korenski imenik.
+
+Ukaz: dirwd mode
+- Izpis trenutnega delovnega imenika.
+- Če je mode enako full se izpiše celotna pot.
+- Če je mode enako base, se izpiše le osnova imena (basename).
+- Če argumenta ne podamo, se privzame base.
+
+Ukaz: dirmk imenik
+- Ustvarjanje podanega imenika.
+
+Ukaz: dirrm imenik
+- Brisanje podanega imenika.
+
+Ukaz: dirls imenik
+- Preprost izpis vsebine imenika.
+- Izpišejo se le imena datotek, ločena z dvema presledkoma.
+- Če imena imenika ne podamo, se privzame trenutni delovni imenik.
+
+Pri ukazih, kot je npr. dirmk, obravnavajte možne napke. Če imenik že obstaja, potem naj se izpiše obvestilo o napaki s funkcijo perror("dirmk"). Status zadnjega izvedenega ukaza pa naj se nastavi na trenutno vrednost errno.

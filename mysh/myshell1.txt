@@ -1,0 +1,67 @@
+
+Začeli bomo s programiranjem ukazne lupine po principu REPL (read-eval-print-loop). Gre za zanko, kjer ponavljamo naslednje:
+
+v interaktivnem načinu izpišemo pozivnik, tj. ime lupine in "> ", npr "mysh> ",
+read: preberemo in razčlenimo eno vrstico s standardnega vhoda,
+eval: jo izvedemo
+print: in izpišemo rezultat na standardni izhod.
+
+Da ugotovimo, ali se je lupina izvaja v interaktivnem načinu, bomo uporabili funkcijo isatty(STDIN_FILENO), ki pove, če je standardni vhod (deskriptor 0) povezan s terminalom (tty) ali pa je bil preusmerjen na branje iz datoteke. V prvem primeru smatramo, da gre za interaktivno izvajanje, sicer pa za neinteraktivno. V okviru avtomatskega testiranja se bo seveda uporabljal le neinteraktiven način, vendar sprogramirajte oba načina.
+
+Začeli bomo z branjem ukazne vrstice, njeno razčlembo in izpisom posameznih simbolov, ki sestavljajo ukaz. Format ukazne vrstice je kar se da preprost.
+
+Komentarji in beli znaki (white space):
+- vsaka vrstica vsebuje kvečjemu en ukaz,
+- prazne vrstice oz. vrstice, ki vsebujejo le bele znake (funkcija isspace()) ignorirajte,
+- komentarji se začnejo z znakom # (in se končajo na koncu vrstice), komentarje ignorirajte.
+
+Razčlemba vrstice na simbole (tokenize):
+- simbol je zaporedje ne-belih znakov, npr. ls, cd, echo, /etc/passwd, &, >out.txt, <in.txt,
+- prav tako je simbol tudi niz obdan z narekovajema, npr. "echo", "ls -alp", "  vsebujem več    presledkov  ",
+- med dvema simboloma je vedno vsaj en beli znak - tako zaporedja kot je npr. a+b smatramo kot en simbol, a + b, pa kot tri simbole.
+
+Predpostavite lahko, da so vrstice podane vedno v pravilni obliki. Torej, da sintaksa vrstice sledi zgoraj zapisanim pravilom, npr. narekovaji vedno nastopajo v parih.
+
+Program naj izpiše prebrano vrstico in vse simbole.
+
+Ko imamo vrstico razčlenjeno na simbole, lahko sprogramiramo razpoznavanje simbolov (parse). Pri tem je sintaksa zopet kar se da preprosta. Osnovno pravilo je:
+- prvi simbol je ime ukaza, ostali simboli so njegovi argumenti.
+
+Izjema pri tem pa so zadnji trije simboli, ki lahko podajajo posebnosti izvedbe ukaza: preusmeritev vhoda, preusmeritev izhoda ali izvajanje v ozadju. Prisotnost teh simbolov je opcijska. Njihovo zaporedje pa je vedno sledeče:
+- morebitna preusmeritev vhoda, podana v obliki <datoteka,
+- morebitna preusmeritev izhoda, podana v obliki >datoteka,
+- morebitno izvajanje v ozadju, podano z znakom &.
+
+Znaki <, > in & imajo torej pri zadnjih treh simbolih poseben pomen. Med znakoma < in > in datoteko ni nikoli presledka. Če je poseben simbol podan, potem se seveda tak simbol ne upošteva kot argument ukaza.
+
+Program naj dodatno izpiše še zaznane posebnosti.
+
+Po razčlembi simbolov in njihovi razpoznavi se lahko lotimo izvedbe podane ukazne vrstice. Ločimo vgrajene in zunanje ukaze. V tem delu bomo sprogramirali nekaj osnovnih vgrajenih ukazov. Običajno imajo vgrajeni ukazi prednost in tako bo tudi pri naši lupini. Torej, če gre za vgrajeni ukaz, ga izvedite glede na navodila spodaj.
+
+Če ne gre za vgrajeni ukaz, potem gre za zunanji ukaz. V tem primeru se le izpiše obvestilo "External command 'UKAZ'", kjer je UKAZ podani ukaz, skupaj z argumenti.
+
+Vsak (notranji ali zunanji) ukaz po izvedbi vrne nek izhodni status, kjer 0 pomeni uspešno izvedbo ukaza. Lupina vodi evidenco o izhodnem statusu zadnjega (v ospredju) izvedenega ukaza (glej tudi ukaz status spodaj).
+
+Ukaz: debug level
+- Opcijski številčni argument level podaja nivo razhroščevanja (debug level).
+- Če argument ni podan, se izpiše trenutni nivo razhroščevanja.
+- Če pa je podan, se nastavi nivo razhroščevanja na podani level. Če uporabnik poda število v napačni obliki, potem se privzame 0. Glej pomoč za funkcijo atoi().
+- Izpise (izpis vhodne vrstice, simbolov in zaznanih posebnosti izvedbe.), ki smo jih že naredili v predhodnih delih, spremenimo tako, da se izpišejo le, če je nivo razhroščevanja večji od 0.
+- Začetni nivo razhroščevanja naj bo 0.
+- Nivoje od 2 in višje lahko uporabljate za svoje potrebe.
+
+Ukaz: prompt poziv
+- S tem ukazovom izpišemo ali nastavimo izpis pozivnika (prompt).
+- Če argument ni podan, potem se izpiše trenutni poziv.
+- Če je podan, pa se nastavi nov pozivnik. Podano ime lahko vsebuje do 8 znakov, v primeru daljšega imena, se vrne izhodni status 1.
+
+Ukaz: status
+- Izpiše se izhodni status zadnjega izvedenega ukaza.
+- Ta ukaz izjemoma status pusti nespremenjen.
+
+Ukaz: exit status
+- Izvajanje lupine se zaključi s podanim izhodnim statusom.
+- Če argument ni podane, se lupina konča s statusom zadnjega izvedenega ukaza.
+
+Ukaz: help
+- Izpiše spisek podprtih ukazov. Izpis oblikujte po vaši želji - se ne preverja avtomatsko.
